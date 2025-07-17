@@ -36,6 +36,21 @@ Matrix getBobsRotation(float& BobAngle, const Camera camera, const Vector3& BobP
     return MatrixRotateXYZ( { 0, BobAngle, 0});
 }
 
+void mainMenu(Camera& camera, const int screenHeight){
+    while(!WindowShouldClose()){
+        UpdateCamera(&camera, CAMERA_FREE);
+
+        if (IsKeyPressed(KEY_SPACE))
+            return;
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+            DrawText("Bob's Mansion", 50, (screenHeight - 92 - 41) / 2, 92, BLACK);
+            DrawText("Press Space to Continue", 50, screenHeight/2 + 140, 41, BLACK);
+        EndDrawing();
+    }
+}
+
 int main(void){
     const int screenWidth = 1920;
     const int screenHeight = 1080;
@@ -44,6 +59,9 @@ int main(void){
     InitAudioDevice();
 
     Camera camera = { 0 };
+
+    mainMenu(camera, screenHeight);
+
     camera.position = (Vector3){ 0.0f, 1.0f, 5.0f };
     camera.target = (Vector3){ 3.0f, 1.0f, 3.0f };
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
@@ -73,7 +91,6 @@ int main(void){
     int isMeleeing = 0;
 
     DisableCursor();
-
     SetTargetFPS(30);
 
     while(!WindowShouldClose()){

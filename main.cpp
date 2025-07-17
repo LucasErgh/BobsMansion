@@ -45,8 +45,8 @@ void mainMenu(Camera& camera, const int screenHeight){
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-            DrawText("Bob's Mansion", 50, (screenHeight - 92 - 41) / 2, 92, BLACK);
-            DrawText("Press Space to Continue", 50, screenHeight/2 + 140, 41, BLACK);
+            DrawText("Bob's Mansion", 50, (screenHeight - 250) / 2, 92, BLACK);
+            DrawText("Press Space to Continue", 50, (screenHeight - 60) / 2, 41, BLACK);
         EndDrawing();
     }
 }

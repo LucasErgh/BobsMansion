@@ -7,6 +7,7 @@
 #include <iostream>
 #include "Gun.hpp"
 #include "bullets.hpp"
+#include "Entity.hpp"
 
 Vector3 getCameraDirection(Camera& camera){
     return Vector3Subtract(camera.target, camera.position);
@@ -47,18 +48,18 @@ int main(void){
     Gun gun;
 
     BoundingBox bounds { {-100, -100, -100}, {100, 100, 100} };
+    std::vector<Bob> bobs;
+    int bobsMurdered = 0;
 
-    Mesh cubeMesh = GenMeshCube(1.0f, 2.0f, 2.0f);
-    Model cube = LoadModelFromMesh(cubeMesh);
+    for (int i = 0; i < 5; ++i) {
+        bobs.push_back(Bob(camera.position));
+    }
 
     Mesh sphereMesh = GenMeshSphere(0.2f, 16, 16);
     Model sphere = LoadModelFromMesh(sphereMesh);
 
     std::vector<Bullet> bullets = {};
     Sound hit = LoadSound("../assets/hit.wav");
-
-    std::vector<BoundingBox> hitboxes;
-    hitboxes.push_back(GetMeshBoundingBox(cube.meshes[0]));
 
     Vector3 spherePos;
     Vector3 sphereDir;
@@ -69,7 +70,11 @@ int main(void){
     while(!WindowShouldClose()){
         UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
-        moveBullets(bullets, bounds, hitboxes, hit);
+        moveBullets(bullets, bounds, bobs, hit);
+        while (bobs.size() < 5){
+            bobs.push_back(Bob(camera.position));
+            ++bobsMurdered;
+        }
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             if (gun.leftClick() == true){
@@ -84,14 +89,18 @@ int main(void){
 
             BeginMode3D(camera);
 
-                DrawModelWires(cube, {0, 0, 0}, 1.0f, BLUE);
-                DrawPlane( {0, 0, 0}, {20, 20}, GRAY);
-                for (auto& cur: bullets){
+                DrawGrid( 20, 1);
+                for (auto& cur : bobs) {
+                    DrawModel(cur.BobModel, cur.position, 1.0f, WHITE);
+                }
+
+                for (auto& cur : bullets) {
                     DrawModel(sphere, cur.position, 1.0f, GREEN);
                 }
 
             EndMode3D();
 
+            DrawText((std::string("Bobs Murdered: ") + std::to_string(bobsMurdered)).c_str(), 10, 10, 40, WHITE);
             gun.draw( {screenWidth/3, screenHeight-750} );
 
             const float crosshairRadiusOutter = 7;

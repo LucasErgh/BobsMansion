@@ -5,13 +5,14 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <vector>
+#include "Entity.hpp"
 
 struct Bullet{
     Vector3 position;
     Vector3 velocity;
 };
 
-void moveBullets(std::vector<Bullet>& bullets, BoundingBox& bounds, std::vector<BoundingBox>& hitboxes, Sound& hit){
+void moveBullets(std::vector<Bullet>& bullets, BoundingBox& bounds, std::vector<Bob>& hitboxes, Sound& hit){
     const float velocityScalar = 2.0f;
     auto cur = bullets.begin();
     while(cur != bullets.end()){
@@ -27,12 +28,17 @@ void moveBullets(std::vector<Bullet>& bullets, BoundingBox& bounds, std::vector<
             cur->position = Vector3Add(cur->position, Vector3Scale(cur->velocity, velocityScalar));
             ray.direction = Vector3Subtract(cur->position, ray.position);
             bool collision = false;
-            for (auto& box : hitboxes){
-                auto col = GetRayCollisionBox(ray, box);
+            auto curBox = hitboxes.begin();
+            while (curBox != hitboxes.end()){
+                auto col = GetRayCollisionBox(ray, curBox->getTranslatedBoundingBox());
                 if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)){
+                    hitboxes.erase(curBox);
                     PlaySound(hit);
                     bullets.erase(cur);
                     collision = true;
+                }
+                else {
+                    curBox++;
                 }
             }
             if (!collision)

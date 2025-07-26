@@ -36,6 +36,7 @@ void moveBullets(std::vector<Bullet>& bullets, BoundingBox& bounds, std::vector<
                     PlaySound(hit);
                     bullets.erase(cur);
                     collision = true;
+                    break;
                 }
                 else {
                     curBox++;

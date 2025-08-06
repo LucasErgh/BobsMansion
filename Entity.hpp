@@ -14,7 +14,8 @@ public:
     Vector3 position;
 
     Bob(Vector3& cameraPos) {
-        BobModel = LoadModel("../assets/BobModel.glb");
+        Bob::BobModel = LoadModel("../assets/BobModel.glb");
+
         position.x = rand() % (int)(spawnRange.max.x - spawnRange.min.x) + (int)spawnRange.min.x;
         position.y = rand() % (int)(spawnRange.max.y - spawnRange.min.y) + (int)spawnRange.min.y;
         position.z = rand() % (int)(spawnRange.max.z - spawnRange.min.z) + (int)spawnRange.min.z;

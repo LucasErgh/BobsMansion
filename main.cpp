@@ -8,6 +8,7 @@
 #include "Gun.hpp"
 #include "bullets.hpp"
 #include "Entity.hpp"
+#include "Item.hpp"
 
 Vector3 getCameraDirection(Camera& camera){
     return Vector3Subtract(camera.target, camera.position);
@@ -64,6 +65,8 @@ int main(void){
     Vector3 spherePos;
     Vector3 sphereDir;
 
+    Item key( {30, 3, 30} );
+
     DisableCursor();
     SetTargetFPS(30);
 
@@ -97,6 +100,8 @@ int main(void){
                 for (auto& cur : bullets) {
                     DrawModel(sphere, cur.position, 1.0f, GREEN);
                 }
+
+                key.renderItem(camera);
 
             EndMode3D();
 

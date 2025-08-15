@@ -16,7 +16,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(raylib)
 
-add_executable(${PROJECT_NAME} "main.cpp")
+add_executable(${PROJECT_NAME} "src/main.cpp")
 
 # make target - 'run' - compiles and runs the produced binary
 add_custom_target(run
@@ -26,3 +26,4 @@ add_custom_target(run
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
+target_include_directories(${PROJECT_NAME} PUBLIC "./include")

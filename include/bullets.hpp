@@ -13,7 +13,7 @@ struct Bullet{
 };
 
 void moveBullets(std::vector<Bullet>& bullets, BoundingBox& bounds, std::vector<Bob>& hitboxes, Sound& hit){
-    const float velocityScalar = 2.0f;
+    const float velocityScalar = 1.0f;
     auto cur = bullets.begin();
     while(cur != bullets.end()){
         if (cur->position.x > bounds.max.x || cur->position.y > bounds.max.y || cur->position.z > bounds.max.z
@@ -31,6 +31,7 @@ void moveBullets(std::vector<Bullet>& bullets, BoundingBox& bounds, std::vector<
             auto curBox = hitboxes.begin();
             while (curBox != hitboxes.end()){
                 auto col = GetRayCollisionBox(ray, curBox->getTranslatedBoundingBox());
+
                 if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)){
                     hitboxes.erase(curBox);
                     PlaySound(hit);

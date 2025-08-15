@@ -5,7 +5,7 @@
 #include "raylib.h"
 
 class Item {
-private:
+public:
     static Texture2D GetBillBoardImage(){
         static bool loaded = false;
         static Texture2D texture;

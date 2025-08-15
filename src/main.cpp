@@ -10,6 +10,8 @@
 #include "Entity.hpp"
 #include "Item.hpp"
 
+
+
 Vector3 getCameraDirection(Camera& camera){
     return Vector3Subtract(camera.target, camera.position);
 }
@@ -40,11 +42,25 @@ int main(void){
 
     mainMenu(camera, screenHeight);
 
-    camera.position = (Vector3){ 0.0f, 1.0f, 5.0f };
+    camera.position = (Vector3){ 0.0f, 0.5f, 5.0f };
     camera.target = (Vector3){ 3.0f, 1.0f, 3.0f };
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
+
+    Image image = LoadImage("../assets/cubicmap.png");      // Load cubicmap image (RAM)
+    Texture2D cubicmap = LoadTextureFromImage(image);       // Convert image to texture to display (VRAM)
+
+    Mesh mesh = GenMeshCubicmap(image, (Vector3){ 1.0f, 1.0f, 1.0f });
+    Model model = LoadModelFromMesh(mesh);
+
+    // NOTE: By default each cube is mapped to one part of texture atlas
+    Texture2D texture = LoadTexture("../assets/cubicmap_atlas.png");    // Load map texture
+    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;    // Set map diffuse texture
+
+    Vector3 mapPosition = { 0.0f, 0.0f, 0.0f };          // Set model position
+
+    UnloadImage(image);     // Unload cubesmap image from RAM, already uploaded to VRAM
 
     Gun gun;
 
@@ -52,15 +68,17 @@ int main(void){
     std::vector<Bob> bobs;
     int bobsMurdered = 0;
 
-    for (int i = 0; i < 5; ++i) {
-        bobs.push_back(Bob(camera.position));
-    }
+    bobs.push_back(Bob({15.0f, -0.5f, 3.0f}));
+    // for (int i = 0; i < 5; ++i) {
+    //     bobs.push_back(Bob(camera.position));
+    // }
 
-    Mesh sphereMesh = GenMeshSphere(0.2f, 16, 16);
+    Mesh sphereMesh = GenMeshSphere(0.05f, 16, 16);
     Model sphere = LoadModelFromMesh(sphereMesh);
 
     std::vector<Bullet> bullets = {};
     Sound hit = LoadSound("../assets/hit.wav");
+    SetSoundVolume(hit, 0.2f);
 
     Vector3 spherePos;
     Vector3 sphereDir;
@@ -73,10 +91,61 @@ int main(void){
     while(!WindowShouldClose()){
         UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
-        moveBullets(bullets, bounds, bobs, hit);
-        while (bobs.size() < 5){
-            bobs.push_back(Bob(camera.position));
-            ++bobsMurdered;
+        const float velocityScalar = 0.5f;
+        auto cur = bullets.begin();
+        while(cur != bullets.end()){
+            if (cur->position.x > bounds.max.x || cur->position.y > bounds.max.y || cur->position.z > bounds.max.z
+                || cur->position.x < bounds.min.x || cur->position.y < bounds.min.y || cur->position.z < bounds.min.z)
+            {
+                bullets.erase(cur);
+            }
+            else {
+                Ray ray;
+                Vector3 startPos = cur->position;
+                ray.position = cur->position;
+                cur->position = Vector3Add(cur->position, Vector3Scale(cur->velocity, velocityScalar));
+                ray.direction = Vector3Subtract(cur->position, ray.position);
+                bool collision = false;
+                auto curBox = bobs.begin();
+                auto col = GetRayCollisionBox(ray, curBox->getTranslatedBoundingBox());
+                DrawRay({col.point, col.normal}, GREEN);
+                if (col.hit) {
+                    while (curBox != bobs.end()){
+                        if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)) {
+                            bobs.erase(curBox);
+                            PlaySound(hit);
+                            bullets.erase(cur);
+                            collision = true;
+                            break;
+                        }
+                        else {
+                            curBox++;
+                        }
+                    }
+                }
+                else {
+                    col = GetRayCollisionMesh(ray, *model.meshes, model.transform);
+                    if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)){
+                        collision = true;
+                        bullets.erase(cur);
+                        PlaySound(hit);
+                        break;
+                    }
+                }
+
+                if (!collision)
+                    ++cur;
+            }
+        }
+
+        static bool colhit = false;
+        const float reachDistance = 2.0f;
+        auto col = GetRayCollisionSphere({camera.position, getCameraDirection(camera)}, key.itemPosition, 2 );
+        if (col.hit && (Vector3Distance(camera.position, col.point) < reachDistance)){
+            colhit = true;
+        }
+        if (IsKeyPressed(KEY_E)){
+            
         }
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -85,16 +154,20 @@ int main(void){
             }
         }
 
-        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) gun.rightClick();
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+            gun.rightClick();
 
         BeginDrawing();
             ClearBackground(BLACK);
 
             BeginMode3D(camera);
 
+            DrawModel(model, mapPosition, 1.0f, WHITE);
+            DrawBoundingBox(GetMeshBoundingBox(model.meshes[0]), GREEN);
+
                 DrawGrid( 20, 1);
                 for (auto& cur : bobs) {
-                    DrawModel(cur.BobModel, cur.position, 1.0f, WHITE);
+                    cur.DrawBobModel();
                 }
 
                 for (auto& cur : bullets) {
@@ -102,16 +175,25 @@ int main(void){
                 }
 
                 key.renderItem(camera);
+                DrawSphere(key.itemPosition, 2.0f, RED);
+
 
             EndMode3D();
 
             DrawText((std::string("Bobs Murdered: ") + std::to_string(bobsMurdered)).c_str(), 10, 10, 40, WHITE);
             gun.draw( {screenWidth/3, screenHeight-750} );
 
-            const float crosshairRadiusOutter = 7;
-            const float crosshairRadiusInner = 4;
-            DrawCircle(screenWidth/2, screenHeight/2, crosshairRadiusOutter, BLACK);
-            DrawCircle(screenWidth/2, screenHeight/2, crosshairRadiusInner, RAYWHITE);
+            // const float crosshairRadiusOutter = 7;
+            // const float crosshairRadiusInner = 4;
+            // DrawCircle(screenWidth/2, screenHeight/2, crosshairRadiusOutter, BLACK);
+            // DrawCircle(screenWidth/2, screenHeight/2, crosshairRadiusInner, RAYWHITE);
+
+            DrawText(std::to_string(camera.position.x).c_str(), 10, 70, 40, WHITE);
+            DrawText(std::to_string(camera.position.y).c_str(), 10, 130, 40, WHITE);
+            DrawText(std::to_string(camera.position.z).c_str(), 10, 190, 40, WHITE);
+
+            if (colhit)
+                DrawText("KEY", 10, 250, 40, WHITE);
 
         EndDrawing();
     }

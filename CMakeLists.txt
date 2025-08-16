@@ -25,5 +25,8 @@ add_custom_target(run
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
+file(GLOB files "./src/*.cpp")
+
+target_sources(${PROJECT_NAME} PRIVATE ${files})
 target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
 target_include_directories(${PROJECT_NAME} PUBLIC "./include" "./src")

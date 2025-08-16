@@ -140,12 +140,11 @@ int main(void){
 
         static bool colhit = false;
         const float reachDistance = 2.0f;
-        auto col = GetRayCollisionSphere({camera.position, getCameraDirection(camera)}, key.itemPosition, 2 );
-        if (col.hit && (Vector3Distance(camera.position, col.point) < reachDistance)){
-            colhit = true;
-        }
         if (IsKeyPressed(KEY_E)){
-            
+            auto col = GetRayCollisionSphere({camera.position, getCameraDirection(camera)}, key.itemPosition, 2 );
+            if (col.hit && (Vector3Distance(camera.position, col.point) < reachDistance)){
+                colhit = true;
+            }
         }
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

@@ -1,3 +1,12 @@
+/*
+    main.cpp
+*/
+
+#include "AssetManager.hpp"
+#include "Gun.hpp"
+#include "bullets.hpp"
+#include "Entity.hpp"
+#include "Item.hpp"
 #include "raylib.h"
 #include "raymath.h"
 #include <string>
@@ -5,12 +14,6 @@
 #include <cstring>
 #include <vector>
 #include <iostream>
-#include "Gun.hpp"
-#include "bullets.hpp"
-#include "Entity.hpp"
-#include "Item.hpp"
-
-
 
 Vector3 getCameraDirection(Camera& camera){
     return Vector3Subtract(camera.target, camera.position);
@@ -48,19 +51,7 @@ int main(void){
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Image image = LoadImage("../assets/cubicmap.png");      // Load cubicmap image (RAM)
-    Texture2D cubicmap = LoadTextureFromImage(image);       // Convert image to texture to display (VRAM)
-
-    Mesh mesh = GenMeshCubicmap(image, (Vector3){ 1.0f, 1.0f, 1.0f });
-    Model model = LoadModelFromMesh(mesh);
-
-    // NOTE: By default each cube is mapped to one part of texture atlas
-    Texture2D texture = LoadTexture("../assets/cubicmap_atlas.png");    // Load map texture
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;    // Set map diffuse texture
-
-    Vector3 mapPosition = { 0.0f, 0.0f, 0.0f };          // Set model position
-
-    UnloadImage(image);     // Unload cubesmap image from RAM, already uploaded to VRAM
+    AssetManager assets;
 
     Gun gun;
 
@@ -124,7 +115,7 @@ int main(void){
                     }
                 }
                 else {
-                    col = GetRayCollisionMesh(ray, *model.meshes, model.transform);
+                    col = GetRayCollisionMesh(ray, *assets.defaultRoom.meshes, assets.defaultRoom.transform);
                     if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)){
                         collision = true;
                         bullets.erase(cur);
@@ -161,10 +152,10 @@ int main(void){
 
             BeginMode3D(camera);
 
-            DrawModel(model, mapPosition, 1.0f, WHITE);
-            DrawBoundingBox(GetMeshBoundingBox(model.meshes[0]), GREEN);
+            DrawModel(assets.defaultRoom, {0, 0, 0}, 1.0f, WHITE);
+            DrawBoundingBox(GetMeshBoundingBox(assets.defaultRoom.meshes[0]), GREEN);
 
-                DrawGrid( 20, 1);
+                DrawGrid(20, 1);
                 for (auto& cur : bobs) {
                     cur.DrawBobModel();
                 }

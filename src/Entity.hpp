@@ -45,6 +45,4 @@ public:
     }
 };
 
-Model* Bob::BobModel = nullptr;
-
 #endif

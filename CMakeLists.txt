@@ -27,6 +27,6 @@ add_custom_target(run
 
 file(GLOB files "./src/*.cpp")
 
-target_sources(${PROJECT_NAME} PRIVATE ${files})
+target_sources(${PROJECT_NAME} PUBLIC ${files})
 target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
 target_include_directories(${PROJECT_NAME} PUBLIC "./include" "./src")

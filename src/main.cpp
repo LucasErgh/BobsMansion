@@ -2,6 +2,7 @@
     main.cpp
 */
 
+#include "Scene.hpp"
 #include "AssetManager.hpp"
 #include "Gun.hpp"
 #include "bullets.hpp"
@@ -55,21 +56,20 @@ int main(void){
 
     Gun gun;
 
-    BoundingBox bounds { {-100, -100, -100}, {100, 100, 100} };
-    std::vector<Bob> bobs;
+    Scene scene = {} ;
+    scene.bounds = { {-100, -100, -100}, {100, 100, 100} };
+
     int bobsMurdered = 0;
 
-    bobs.push_back(Bob({15.0f, -0.5f, 3.0f}));
+    scene.bobs.push_back(Bob({15.0f, -0.5f, 3.0f}));
     // for (int i = 0; i < 5; ++i) {
     //     bobs.push_back(Bob(camera.position));
     // }
 
-    std::vector<Bullet> bullets = {};
-
     Vector3 spherePos;
     Vector3 sphereDir;
 
-    Item key( {30, 3, 30} );
+    Item key( {16.0f, 0.5f, 8.0f} );
 
     DisableCursor();
     SetTargetFPS(60);
@@ -77,65 +77,20 @@ int main(void){
     while(!WindowShouldClose()){
         UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
-        const float velocityScalar = 0.5f;
-        auto cur = bullets.begin();
-        while(cur != bullets.end()){
-            if (cur->position.x > bounds.max.x || cur->position.y > bounds.max.y || cur->position.z > bounds.max.z
-                || cur->position.x < bounds.min.x || cur->position.y < bounds.min.y || cur->position.z < bounds.min.z)
-            {
-                bullets.erase(cur);
-            }
-            else {
-                Ray ray;
-                Vector3 startPos = cur->position;
-                ray.position = cur->position;
-                cur->position = Vector3Add(cur->position, Vector3Scale(cur->velocity, velocityScalar));
-                ray.direction = Vector3Subtract(cur->position, ray.position);
-                bool collision = false;
-                auto curBox = bobs.begin();
-                auto col = GetRayCollisionBox(ray, curBox->getTranslatedBoundingBox(assets));
-                DrawRay({col.point, col.normal}, GREEN);
-                if (col.hit) {
-                    while (curBox != bobs.end()){
-                        if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)) {
-                            bobs.erase(curBox);
-                            PlaySound(assets.hitSound);
-                            bullets.erase(cur);
-                            collision = true;
-                            break;
-                        }
-                        else {
-                            curBox++;
-                        }
-                    }
-                }
-                else {
-                    col = GetRayCollisionMesh(ray, *assets.defaultRoom.meshes, assets.defaultRoom.transform);
-                    if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)){
-                        collision = true;
-                        bullets.erase(cur);
-                        PlaySound(assets.hitSound);
-                        break;
-                    }
-                }
-
-                if (!collision)
-                    ++cur;
-            }
-        }
+        scene.updateBullets(assets);
 
         static bool colhit = false;
         const float reachDistance = 2.0f;
         if (IsKeyPressed(KEY_E)){
             auto col = GetRayCollisionSphere({camera.position, getCameraDirection(camera)}, key.itemPosition, 2 );
-            if (col.hit && (Vector3Distance(camera.position, col.point) < reachDistance)){
+            if (col.hit && (Vector3Distance(camera.position, col.point) < reachDistance || Vector3Distance(camera.position, key.itemPosition) < 0.5f)) {
                 colhit = true;
             }
         }
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             if (gun.leftClick(assets) == true){
-                bullets.push_back( {camera.position, getCameraDirection(camera) } );
+                scene.bullets.push_back( {camera.position, getCameraDirection(camera) } );
             }
         }
 
@@ -151,11 +106,11 @@ int main(void){
                 DrawBoundingBox(GetMeshBoundingBox(assets.defaultRoom.meshes[0]), GREEN);
 
                 DrawGrid(20, 1);
-                for (auto& cur : bobs) {
+                for (auto& cur : scene.bobs) {
                     cur.DrawBobModel(assets);
                 }
 
-                for (auto& cur : bullets) {
+                for (auto& cur : scene.bullets) {
                     DrawModel(assets.bulletModel, cur.position, 1.0f, GREEN);
                 }
 

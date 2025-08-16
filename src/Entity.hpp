@@ -14,6 +14,7 @@ public:
     Vector3 position;
 
     ~Bob(){
+
     }
 
     Bob(Vector3 cameraPos) : position(cameraPos){

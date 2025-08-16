@@ -5,12 +5,13 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <vector>
-#include "Entity.hpp"
 
 struct Bullet{
     Vector3 position;
     Vector3 velocity;
 };
+
+
 
 // void moveBullets(std::vector<Bullet>& bullets, BoundingBox& bounds, std::vector<Bob>& hitboxes, Sound& hit){
 //     const float velocityScalar = 1.0f;

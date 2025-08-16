@@ -21,6 +21,8 @@ AssetManager::AssetManager() {
 
     Mesh sphereMesh = GenMeshSphere(0.05f, 16, 16);
     bulletModel = LoadModelFromMesh(sphereMesh);
+
+    bobModel = LoadModel("../assets/BobModel.glb");
 }
 
 AssetManager::~AssetManager() {
@@ -33,4 +35,6 @@ AssetManager::~AssetManager() {
     UnloadSound(pewSounds[2]);
 
     UnloadModel(bulletModel);
+
+    UnloadModel(bobModel);
 }

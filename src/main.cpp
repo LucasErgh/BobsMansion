@@ -93,7 +93,7 @@ int main(void){
                 ray.direction = Vector3Subtract(cur->position, ray.position);
                 bool collision = false;
                 auto curBox = bobs.begin();
-                auto col = GetRayCollisionBox(ray, curBox->getTranslatedBoundingBox());
+                auto col = GetRayCollisionBox(ray, curBox->getTranslatedBoundingBox(assets));
                 DrawRay({col.point, col.normal}, GREEN);
                 if (col.hit) {
                     while (curBox != bobs.end()){
@@ -152,7 +152,7 @@ int main(void){
 
                 DrawGrid(20, 1);
                 for (auto& cur : bobs) {
-                    cur.DrawBobModel();
+                    cur.DrawBobModel(assets);
                 }
 
                 for (auto& cur : bullets) {

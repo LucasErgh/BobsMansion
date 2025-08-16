@@ -2,6 +2,7 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
+#include "AssetManager.hpp"
 #include "raylib.h"
 #include "raymath.h"
 #include <stdlib.h>
@@ -9,19 +10,10 @@
 
 class Bob {
 public:
-    static Model* BobModel;
     BoundingBox spawnRange = { {-30, 0, -30}, {10, 10, -40} };
     Vector3 position;
 
     ~Bob(){
-    }
-
-    static Model* GetBobModel() {
-        if (BobModel == nullptr) {
-            BobModel = new Model();
-            (*BobModel) = LoadModel("../assets/BobModel.glb");
-        }
-        return BobModel;
     }
 
     Bob(Vector3 cameraPos) : position(cameraPos){
@@ -33,15 +25,15 @@ public:
         // BobModel.transform = MatrixRotateXYZ( {0, angle + PI - PI/4, 0});
     }
 
-    BoundingBox getTranslatedBoundingBox() {
-        BoundingBox hitbox = GetModelBoundingBox(*BobModel);
+    BoundingBox getTranslatedBoundingBox(const AssetManager& assets) {
+        BoundingBox hitbox = GetModelBoundingBox(assets.bobModel);
         hitbox.min = Vector3Add(hitbox.min, position);
         hitbox.max = Vector3Add(hitbox.max, position);
         return hitbox;
     }
 
-    void DrawBobModel() {
-        DrawModel(*GetBobModel(), position, 1.0f, WHITE);
+    void DrawBobModel(const AssetManager& assets) {
+        DrawModel(assets.bobModel, position, 1.0f, WHITE);
     }
 };
 

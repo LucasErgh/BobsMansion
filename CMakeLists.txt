@@ -26,4 +26,4 @@ add_custom_target(run
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
-target_include_directories(${PROJECT_NAME} PUBLIC "./include")
+target_include_directories(${PROJECT_NAME} PUBLIC "./include" "./src")

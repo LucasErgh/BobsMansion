@@ -68,8 +68,6 @@ int main(void){
     Model sphere = LoadModelFromMesh(sphereMesh);
 
     std::vector<Bullet> bullets = {};
-    Sound hit = LoadSound("../assets/hit.wav");
-    SetSoundVolume(hit, 0.2f);
 
     Vector3 spherePos;
     Vector3 sphereDir;
@@ -77,7 +75,7 @@ int main(void){
     Item key( {30, 3, 30} );
 
     DisableCursor();
-    SetTargetFPS(30);
+    SetTargetFPS(60);
 
     while(!WindowShouldClose()){
         UpdateCamera(&camera, CAMERA_FIRST_PERSON);
@@ -104,7 +102,7 @@ int main(void){
                     while (curBox != bobs.end()){
                         if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)) {
                             bobs.erase(curBox);
-                            PlaySound(hit);
+                            PlaySound(assets.hitSound);
                             bullets.erase(cur);
                             collision = true;
                             break;
@@ -119,7 +117,7 @@ int main(void){
                     if (col.hit && Vector3Distance(col.point, startPos) < Vector3Distance(cur->position, startPos)){
                         collision = true;
                         bullets.erase(cur);
-                        PlaySound(hit);
+                        PlaySound(assets.hitSound);
                         break;
                     }
                 }
@@ -139,7 +137,7 @@ int main(void){
         }
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            if (gun.leftClick() == true){
+            if (gun.leftClick(assets) == true){
                 bullets.push_back( {camera.position, getCameraDirection(camera) } );
             }
         }

@@ -16,7 +16,6 @@ public:
 
     static const int numPews = 3;
     int PewIndex = 0;
-    Sound Pews[numPews];
 
     Gun() {
         Image GunImage = LoadImage("../assets/Gun.png");
@@ -30,19 +29,12 @@ public:
         UnloadImage(GunImage);
         UnloadImage(GunFiringImage);
         UnloadImage(MeleeImage);
-
-        Pews[0] = LoadSound("../assets/Pew1.wav");
-        Pews[1] = LoadSound("../assets/Pew2.wav");
-        Pews[2] = LoadSound("../assets/Pew3.wav");
     }
 
     ~Gun() {
         UnloadTexture(GunTexture);
         UnloadTexture(GunFiring);
         UnloadTexture(Melee);
-        for (int i = 0; i < numPews; ++i){
-            UnloadSound(Pews[i]);
-        }
     }
 
     void rightClick() {
@@ -53,13 +45,13 @@ public:
     }
 
     // returns flag, true - create bullet, false - dont create bullet
-    bool leftClick() {
+    bool leftClick(const AssetManager& assets) {
         if (animationFrame != 0)
             return false;
         animationFrame = coolDown;
         isShooting = true;
 
-        PlaySound(Pews[PewIndex++]);
+        PlaySound(assets.pewSounds[PewIndex++]);
         if (PewIndex >= numPews)
             PewIndex = 0;
 

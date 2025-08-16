@@ -15,19 +15,19 @@ public:
     AssetManager();
     ~AssetManager();
 
-    // Model bulletModel;
-    // Texture2D gunTexture;
-    // Texture2D gunFiringTexture;
-    // Texture2D meleeTexture;
-    // Sound PewSounds[3];
-    // Sound hitSound;
+    Model bulletModel;
+    Texture2D gunTexture;
+    Texture2D gunFiringTexture;
+    Texture2D meleeTexture;
+    Sound pewSounds[3];
+    Sound hitSound;
 
-    // Texture2D keyTexture;
+    Texture2D keyTexture;
 
     Texture2D mapImage;
     Model defaultRoom;
 
-    // Model bobModel;
+    Model bobModel;
 };
 
 #endif

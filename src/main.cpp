@@ -159,8 +159,8 @@ int main(void){
                     DrawModel(assets.bulletModel, cur.position, 1.0f, GREEN);
                 }
 
-                key.renderItem(camera);
-                DrawSphere(key.itemPosition, 2.0f, RED);
+                key.renderItem(camera, assets);
+                // DrawSphere(key.itemPosition, 2.0f, RED);
 
             EndMode3D();
 

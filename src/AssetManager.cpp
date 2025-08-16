@@ -23,6 +23,8 @@ AssetManager::AssetManager() {
     bulletModel = LoadModelFromMesh(sphereMesh);
 
     bobModel = LoadModel("../assets/BobModel.glb");
+
+    keyTexture = LoadTexture("../assets/Key.png");
 }
 
 AssetManager::~AssetManager() {
@@ -37,4 +39,6 @@ AssetManager::~AssetManager() {
     UnloadModel(bulletModel);
 
     UnloadModel(bobModel);
+
+    UnloadTexture(keyTexture);
 }

@@ -18,13 +18,19 @@ AssetManager::AssetManager() {
     pewSounds[0] = LoadSound("../assets/Pew1.wav");
     pewSounds[1] = LoadSound("../assets/Pew2.wav");
     pewSounds[2] = LoadSound("../assets/Pew3.wav");
+
+    Mesh sphereMesh = GenMeshSphere(0.05f, 16, 16);
+    bulletModel = LoadModelFromMesh(sphereMesh);
 }
 
 AssetManager::~AssetManager() {
     UnloadModel(defaultRoom);
     UnloadTexture(mapImage);
+
     UnloadSound(hitSound);
     UnloadSound(pewSounds[0]);
     UnloadSound(pewSounds[1]);
     UnloadSound(pewSounds[2]);
+
+    UnloadModel(bulletModel);
 }

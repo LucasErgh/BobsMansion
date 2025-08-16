@@ -64,9 +64,6 @@ int main(void){
     //     bobs.push_back(Bob(camera.position));
     // }
 
-    Mesh sphereMesh = GenMeshSphere(0.05f, 16, 16);
-    Model sphere = LoadModelFromMesh(sphereMesh);
-
     std::vector<Bullet> bullets = {};
 
     Vector3 spherePos;
@@ -150,8 +147,8 @@ int main(void){
 
             BeginMode3D(camera);
 
-            DrawModel(assets.defaultRoom, {0, 0, 0}, 1.0f, WHITE);
-            DrawBoundingBox(GetMeshBoundingBox(assets.defaultRoom.meshes[0]), GREEN);
+                DrawModel(assets.defaultRoom, {0, 0, 0}, 1.0f, WHITE);
+                DrawBoundingBox(GetMeshBoundingBox(assets.defaultRoom.meshes[0]), GREEN);
 
                 DrawGrid(20, 1);
                 for (auto& cur : bobs) {
@@ -159,12 +156,11 @@ int main(void){
                 }
 
                 for (auto& cur : bullets) {
-                    DrawModel(sphere, cur.position, 1.0f, GREEN);
+                    DrawModel(assets.bulletModel, cur.position, 1.0f, GREEN);
                 }
 
                 key.renderItem(camera);
                 DrawSphere(key.itemPosition, 2.0f, RED);
-
 
             EndMode3D();
 

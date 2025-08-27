@@ -36,9 +36,10 @@ void mainMenu(Camera& camera, const int screenHeight){
 }
 
 int main(void){
-    const int screenWidth = 1920;
-    const int screenHeight = 1080;
+    float screenWidth = 800;
+    float screenHeight = 450;
 
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "Bob's Mansion");
     InitAudioDevice();
 
@@ -87,15 +88,16 @@ int main(void){
                 colhit = true;
             }
         }
-
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             if (gun.leftClick(assets) == true){
                 scene.bullets.push_back( {camera.position, getCameraDirection(camera) } );
             }
         }
-
         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
             gun.rightClick();
+        if (IsWindowResized()){
+            gun.rescaleGun(GetScreenWidth(), GetScreenHeight());
+        }
 
         BeginDrawing();
             ClearBackground(BLACK);
@@ -127,9 +129,11 @@ int main(void){
             // DrawCircle(screenWidth/2, screenHeight/2, crosshairRadiusOutter, BLACK);
             // DrawCircle(screenWidth/2, screenHeight/2, crosshairRadiusInner, RAYWHITE);
 
+            const int textSpacing = 60;
             DrawText(std::to_string(camera.position.x).c_str(), 10, 70, 40, WHITE);
             DrawText(std::to_string(camera.position.y).c_str(), 10, 130, 40, WHITE);
             DrawText(std::to_string(camera.position.z).c_str(), 10, 190, 40, WHITE);
+            DrawText(std::to_string(gun.scale).c_str(), 10, 250, 40, WHITE);
 
             if (colhit)
                 DrawText("KEY", 10, 250, 40, WHITE);

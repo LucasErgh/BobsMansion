@@ -14,10 +14,15 @@ public:
     bool isMeleeing = false;
     const int coolDown = 5;
 
+    float scale = 1.0f;
+    Vector2 drawPosition;
+
     static const int numPews = 3;
     int PewIndex = 0;
 
     Gun() {
+        rescaleGun(GetScreenWidth(), GetScreenHeight());
+
         Image GunImage = LoadImage("../assets/Gun.png");
         Image GunFiringImage = LoadImage("../assets/GunFiring.png");
         Image MeleeImage = LoadImage ("../assets/Melee.png");
@@ -35,6 +40,22 @@ public:
         UnloadTexture(GunTexture);
         UnloadTexture(GunFiring);
         UnloadTexture(Melee);
+    }
+
+    void rescaleGun(float screenWidth, float screenHeight) {
+        float smallerScreenDimension;
+        float gunDimension;
+        if (screenWidth < screenHeight) {
+            smallerScreenDimension = screenWidth;
+            gunDimension = GunTexture.width;
+        } else {
+            smallerScreenDimension = screenHeight;
+            gunDimension = GunTexture.height;
+        }
+        scale = smallerScreenDimension/gunDimension*.5;
+
+        drawPosition.x = screenWidth/2;
+        drawPosition.y = screenHeight - (GunTexture.height * scale);
     }
 
     void rightClick() {
@@ -63,11 +84,11 @@ public:
             --animationFrame;
 
         if (animationFrame == 0) {
-            DrawTexture(GunTexture, drawPos.x, drawPos.y, WHITE);
+            DrawTextureEx(GunTexture, drawPosition, 0.0f, scale, WHITE);
         } else if (isMeleeing) {
-            DrawTexture(Melee, drawPos.x, drawPos.y, WHITE);
+            DrawTextureEx(Melee, drawPosition, 0.0f, scale, WHITE);
         } else if (isShooting) {
-            DrawTexture(GunFiring, drawPos.x, drawPos.y, WHITE);
+            DrawTextureEx(GunFiring, drawPosition, 0.0f, scale, WHITE);
         }
     }
 };

@@ -6,6 +6,7 @@
 #define ASSETMANAGER_HPP
 
 #include "raylib.h"
+#include "raymath.h"
 #include <string>
 #include <unordered_map>
 
@@ -14,6 +15,8 @@ public:
 
     AssetManager();
     ~AssetManager();
+
+    void loadAssets();
 
     Model bulletModel;
     Texture2D gunTexture;

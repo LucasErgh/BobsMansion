@@ -5,7 +5,12 @@
 #include "AssetManager.hpp"
 
 AssetManager::AssetManager() {
+
+}
+
+void AssetManager::loadAssets(){
     Image image = LoadImage("../assets/cubicmap.png");
+
     mapImage = LoadTextureFromImage(image);
     Mesh mesh = GenMeshCubicmap(image, (Vector3){ 1.0f, 1.0f, 1.0f });
     defaultRoom = LoadModelFromMesh(mesh);

@@ -14,6 +14,7 @@ public:
     bool isMeleeing = false;
     const int coolDown = 5;
 
+    float size = 0.75f;
     float scale = 1.0f;
     Vector2 drawPosition;
 
@@ -21,8 +22,6 @@ public:
     int PewIndex = 0;
 
     Gun() {
-        rescaleGun(GetScreenWidth(), GetScreenHeight());
-
         Image GunImage = LoadImage("../assets/Gun.png");
         Image GunFiringImage = LoadImage("../assets/GunFiring.png");
         Image MeleeImage = LoadImage ("../assets/Melee.png");
@@ -34,6 +33,8 @@ public:
         UnloadImage(GunImage);
         UnloadImage(GunFiringImage);
         UnloadImage(MeleeImage);
+
+        rescaleGun((float)GetScreenWidth(), (float)GetScreenHeight());
     }
 
     ~Gun() {
@@ -52,7 +53,7 @@ public:
             smallerScreenDimension = screenHeight;
             gunDimension = GunTexture.height;
         }
-        scale = smallerScreenDimension/gunDimension*.5;
+        scale = smallerScreenDimension/gunDimension*size;
 
         drawPosition.x = screenWidth/2;
         drawPosition.y = screenHeight - (GunTexture.height * scale);

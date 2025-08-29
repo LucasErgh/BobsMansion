@@ -42,29 +42,7 @@ void Game::run(){
             EndDrawing();
             break;
         case WindowState::InGame:
-            scene.updateBullets(assets);
-
-            if (IsKeyPressed(KEY_E)){
-                auto col = GetRayCollisionSphere({camera.position, getCameraDirection(camera)}, key.itemPosition, 2 );
-                if (col.hit && (Vector3Distance(camera.position, col.point) < reachDistance || Vector3Distance(camera.position, key.itemPosition) < 0.5f)) {
-                    colhit = true;
-                }
-            }
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (gun.leftClick(assets) == true){
-                    scene.bullets.push_back( {camera.position, getCameraDirection(camera) } );
-                }
-            }
-            if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-                gun.rightClick();
-            }
-            if (IsWindowResized()){
-                screenWidth = GetScreenWidth();
-                screenHeight = GetScreenHeight();
-                gun.rescaleGun(screenWidth, screenHeight);
-            }
-            drawGame();
-
+            processInGame();
             break;
         default:
             break;
@@ -72,16 +50,58 @@ void Game::run(){
     }
 }
 
-void Game::processInGame(){
+bool Game::cursorLookCollision(){
+    RayCollision col = { 0 };
+    Ray ray = GetScreenToWorldRay({screenWidth/2, screenHeight/2}, camera);
+    col = GetRayCollisionSphere(ray /*{camera.position, getCameraDirection(camera)}*/, spherePos, sphereRadius );
 
+    DrawSphere(spherePos, sphereRadius, BLUE);
+    if ( col.hit /*&& (Vector3Distance(key.itemPosition, col.point) <= 0.5f && Vector3Distance(camera.position, key.itemPosition) <= reachDistance)*/) {
+        DrawSphere(col.point, 0.125f, ORANGE);
+        return true;
+    } else return false;
+}
+
+void Game::processInGame(){
+    scene.updateBullets(assets);
+
+    // if (cursorLookCollision()) {
+    //     promptInteract = true;
+    // } else {
+    //     promptInteract = false;
+    // }
+
+    if (IsKeyPressed(KEY_E)){
+        if (cursorLookCollision())
+            colhit = true;
+    }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (gun.leftClick(assets) == true){
+            scene.bullets.push_back( {camera.position, getCameraDirection(camera) } );
+        }
+    }
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        gun.rightClick();
+    }
+    if (IsWindowResized()){
+        screenWidth = GetScreenWidth();
+        screenHeight = GetScreenHeight();
+        gun.rescaleGun(screenWidth, screenHeight);
+    }
+    drawGame();
 }
 
 void Game::drawGame(){
     BeginDrawing();
-        ClearBackground(BLACK);
 
+        ClearBackground(BLACK);
         BeginMode3D(camera);
             drawScene();
+            if (cursorLookCollision()) {
+                promptInteract = true;
+            } else {
+                promptInteract = false;
+            }
         EndMode3D();
 
         drawHud();
@@ -100,6 +120,7 @@ void Game::drawScene(){
         DrawModel(assets.bulletModel, cur.position, 1.0f, GREEN);
     }
     key.renderItem(camera, assets);
+    DrawSphere(key.itemPosition, 0.25f, RED);
 }
 
 void Game::drawHud(){
@@ -117,6 +138,12 @@ void Game::drawHud(){
     DrawText(std::to_string(camera.position.z).c_str(), 10, 190, 40, WHITE);
     DrawText(std::to_string(gun.scale).c_str(), 10, 250, 40, WHITE);
 
+    // auto col = GetRayCollisionSphere({camera.position, getCameraDirection(camera)}, key.itemPosition, 0.8f );
+    // DrawText(std::to_string(Vector3Distance(camera.position, col.point)).c_str(), screenWidth/2, screenHeight/2 - 60, 40, WHITE);
+    // DrawText(std::to_string(Vector3Distance(camera.position, key.itemPosition)).c_str(), screenWidth/2, screenHeight/2 - 120, 40, WHITE);
+
+    if (promptInteract)
+        DrawText("PICKUP", screenWidth/2, screenHeight/2, 40, WHITE);
     if (colhit)
         DrawText("KEY", 10, 310, 40, WHITE);
 }

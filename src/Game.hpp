@@ -32,6 +32,21 @@ enum WindowState{
 
 class Game{
 public:
+    Game();
+
+    void InitializeWindow();
+    void run();
+
+    bool cursorLookCollision();
+    void processInGame();
+
+    void drawGame();
+    void drawScene();
+    void drawHud();
+
+    Vector3 getCameraDirection(Camera& camera);
+
+public:
     float screenWidth = 800;
     float screenHeight = 450;
 
@@ -42,27 +57,19 @@ public:
     Scene scene = {};
 
     bool colhit = false;
-    int bobsMurdered = 0;
     bool inMainMenu = true;
 
-    Vector3 spherePos;
+    int bobsMurdered = 0;
+    bool promptInteract;
+    float reachDistance = 2.0f;
+
+    Vector3 spherePos = { 16.0f, 0.5f, 8.0f };
+    float sphereRadius = 0.25f;
     Vector3 sphereDir;
 
     Item key;
 
     WindowState winState = MainMenu;
-
-    Game();
-
-    void InitializeWindow();
-    void run();
-    void processInGame();
-
-    void drawGame();
-    void drawScene();
-    void drawHud();
-
-    Vector3 getCameraDirection(Camera& camera);
 };
 
 #endif
